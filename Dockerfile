@@ -54,5 +54,6 @@ RUN touch elk_start.sh && \
 
 ## TODO
 # expose ports write documentation
-
+# 80=nginx, 9200=elasticsearch, 5140=logstash 443=ssl support if no external offloading. udp input
+EXPOSE 80 4439200 5140
 CMD /elk_start.sh
