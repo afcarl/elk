@@ -10,9 +10,9 @@
 FROM ubuntu:15.10
 MAINTAINER DIREKTSPEED
 ## needs upgrading!
-ENV KIBANA_VER = 3.1.0
-ENV ELS_VER = 1.3.1
-ENV LOGSTASH_VER = 1.4.2
+ENV KIBANA_VER 3.1.0
+ENV ELS_VER 1.3.1
+ENV LOGSTASH_VER 1.4.2
 
 # Initial update 
 RUN apt-get update \
