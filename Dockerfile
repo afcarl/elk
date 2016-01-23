@@ -9,6 +9,10 @@
 
 FROM ubuntu:15.10
 MAINTAINER DIREKTSPEED
+## needs upgrading!
+ENV KIBANA_VER = 3.1.0
+ENV ELS_VER = 1.3.1
+ENV LOGSTASH_VER = 1.4.2
 
 # Initial update 
 RUN apt-get update \
@@ -23,24 +27,24 @@ RUN apt-get update \
  && apt-get update \
  && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections \
  && apt-get install -y oracle-java8-installer \
- && wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.1.tar.gz \
+ && wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ELS_VER}.tar.gz \
  && echo "# Elasticsearch installation \n Start Elasticsearch by /elasticsearch/bin/elasticsearch. This will run on port 9200."
- && tar xf elasticsearch-1.3.1.tar.gz \
- && rm elasticsearch-1.3.1.tar.gz && \
- && mv elasticsearch-1.3.1 elasticsearch \
+ && tar xf elasticsearch-${ELS_VER}.tar.gz \
+ && rm elasticsearch-${ELS_VER}.tar.gz && \
+ && mv elasticsearch-${ELS_VER} elasticsearch \
  && echo "# Logstash installation \n # Create a logstash.conf and start logstash by /logstash/bin/logstash agent -f logstash.conf" \
- && wget https://download.elasticsearch.org/logstash/logstash/logstash-1.4.2.tar.gz \
- && tar xf logstash-1.4.2.tar.gz \
- && rm logstash-1.4.2.tar.gz \
- && mv logstash-1.4.2 logstash \
+ && wget https://download.elasticsearch.org/logstash/logstash/logstash-${LOGSTASH_VER}.tar.gz \
+ && tar xf logstash-${LOGSTASH_VER}.tar.gz \
+ && rm logstash-${LOGSTASH_VER}.tar.gz \
+ && mv logstash-${LOGSTASH_VER} logstash \
  && echo "# Kibana installation \n" \
- && wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz \
- && tar xf kibana-3.1.0.tar.gz \
- && rm kibana-3.1.0.tar.gz \
- && mv kibana-3.1.0  kibana \
- && echo "# Deploy kibana to Nginx \n" \
+ && wget https://download.elasticsearch.org/kibana/kibana/kibana-${KIBANA_VER}.tar.gz \
+ && tar xf kibana-${KIBANA_VER}.tar.gz \
+ && rm kibana-${KIBANA_VER}.tar.gz \
+ && mv kibana-${KIBANA_VER}  kibana \
+ && echo "# Deploy kibana ${KIBANA_VER} to Nginx \n" \
  && mv /usr/share/nginx/html /usr/share/nginx/html_orig \
- && mkdir /usr/share/nginx/html && \
+ && mkdir /usr/share/nginx/html \
  && cp -r /kibana/* /usr/share/nginx/html
 
 # Create a start bash script
