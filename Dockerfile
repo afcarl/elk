@@ -7,56 +7,41 @@
 # To login to bash: docker run -t -v /conf/logstash:/conf -i northshore/elk /bin/bash
 
 
-FROM ubuntu:latest
-MAINTAINER Northshore Network Solutions LLC 
-# Initial update
-RUN apt-get update
+FROM ubuntu:15.10
+MAINTAINER DIREKTSPEED
 
-# This is to install add-apt-repository utility. All commands have to be non interactive with -y option
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-
-# Install Oracle Java 8, accept license command is required for non interactive mode
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
-   DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:webupd8team/java && \
-   apt-get update && \
-   echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections &&\
-   DEBIAN_FRONTEND=noninteractive apt-get install -y oracle-java8-installer
-
-# Elasticsearch installation
-# Start Elasticsearch by /elasticsearch/bin/elasticsearch. This will run on port 9200.
-RUN wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.1.tar.gz && \
-   tar xf elasticsearch-1.3.1.tar.gz && \
-   rm elasticsearch-1.3.1.tar.gz && \
-   mv elasticsearch-1.3.1 elasticsearch 
-
-# Logstash installation
-# Create a logstash.conf and start logstash by /logstash/bin/logstash agent -f logstash.conf
-RUN wget https://download.elasticsearch.org/logstash/logstash/logstash-1.4.2.tar.gz && \
-   tar xf logstash-1.4.2.tar.gz && \
-   rm logstash-1.4.2.tar.gz && \
-   mv logstash-1.4.2 logstash
-
-# Kibana installation
-RUN wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz && \
-   tar xf kibana-3.1.0.tar.gz && \
-   rm kibana-3.1.0.tar.gz && \
-   mv kibana-3.1.0  kibana
-
-# Install curl utility just for testing
-RUN apt-get update && \
-   apt-get install -y curl
-
-# Install Nginx
-# Start or stop with /etc/init.d/nginx start/stop. Runs on port 80.
-# Sed command is to make the worker threads of nginx run as user root
-RUN apt-get update && \
-   DEBIAN_FRONTEND=noninteractive apt-get install -y nginx && \
-   sed -i -e 's/www-data/root/g' /etc/nginx/nginx.conf
-
-# Deploy kibana to Nginx
-RUN mv /usr/share/nginx/html /usr/share/nginx/html_orig && \
-   mkdir /usr/share/nginx/html && \
-   cp -r /kibana/* /usr/share/nginx/html
+# Initial update 
+RUN apt-get update \
+ && echo "# Install curl utility just for testing \n" \
+ && apt-get install -y software-properties-common  curl nginx\
+ && echo "# Install Nginx \n # Start or stop with /etc/init.d/nginx start/stop. Runs on port 80. \n # Sed command is to make the worker threads of nginx run as user root" \
+ && sed -i -e 's/www-data/root/g' /etc/nginx/nginx.conf \
+ && echo "# This is to install add-apt-repository utility. All commands have to be non interactive with -y option \n" \
+ && echo "# Install Oracle Java 8, accept license command is required for non interactive mode \n"
+ && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 \
+ && add-apt-repository -y ppa:webupd8team/java \
+ && apt-get update \
+ && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections \
+ && apt-get install -y oracle-java8-installer \
+ && wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.1.tar.gz \
+ && echo "# Elasticsearch installation \n Start Elasticsearch by /elasticsearch/bin/elasticsearch. This will run on port 9200."
+ && tar xf elasticsearch-1.3.1.tar.gz \
+ && rm elasticsearch-1.3.1.tar.gz && \
+ && mv elasticsearch-1.3.1 elasticsearch \
+ && echo "# Logstash installation \n # Create a logstash.conf and start logstash by /logstash/bin/logstash agent -f logstash.conf" \
+ && wget https://download.elasticsearch.org/logstash/logstash/logstash-1.4.2.tar.gz \
+ && tar xf logstash-1.4.2.tar.gz \
+ && rm logstash-1.4.2.tar.gz \
+ && mv logstash-1.4.2 logstash \
+ && echo "# Kibana installation \n" \
+ && wget https://download.elasticsearch.org/kibana/kibana/kibana-3.1.0.tar.gz \
+ && tar xf kibana-3.1.0.tar.gz \
+ && rm kibana-3.1.0.tar.gz \
+ && mv kibana-3.1.0  kibana \
+ && echo "# Deploy kibana to Nginx \n" \
+ && mv /usr/share/nginx/html /usr/share/nginx/html_orig \
+ && mkdir /usr/share/nginx/html && \
+ && cp -r /kibana/* /usr/share/nginx/html
 
 # Create a start bash script
 RUN touch elk_start.sh && \
@@ -67,3 +52,7 @@ RUN touch elk_start.sh && \
    echo 'exec /logstash/bin/logstash agent -f /conf/logstash.conf' >> elk_start.sh && \
    chmod 777 elk_start.sh
 
+## TODO
+# expose ports write documentation
+
+CMD /elk_start.sh
